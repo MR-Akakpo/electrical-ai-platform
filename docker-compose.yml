@@ -1,0 +1,72 @@
+version: "3.9"
+
+name: electrical_ai_platform
+
+services:
+
+  electrical_postgres_db:
+    image: postgres:16
+    container_name: electrical_postgres_db
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: electrical_admin
+      POSTGRES_PASSWORD: electrical_secure_password
+      POSTGRES_DB: electrical_ai_database
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - electrical_postgres_volume:/var/lib/postgresql/data
+
+    networks:
+      - electrical_network
+
+  electrical_chromadb_vector:
+    image: chromadb/chroma
+    container_name: electrical_chromadb_vector
+    restart: unless-stopped
+
+    ports:
+      - "8100:8000"
+
+    volumes:
+      - electrical_chroma_volume:/chroma/chroma
+
+    networks:
+      - electrical_network
+
+  electrical_minio_storage:
+    image: minio/minio
+    container_name: electrical_minio_storage
+    restart: unless-stopped
+
+    command: server /data --console-address ":9001"
+
+    environment:
+      MINIO_ROOT_USER: electrical_admin
+      MINIO_ROOT_PASSWORD: electrical_minio_password
+
+    ports:
+      - "9100:9000"
+      - "9101:9001"
+
+    volumes:
+      - electrical_minio_volume:/data
+
+    networks:
+      - electrical_network
+
+volumes:
+
+  electrical_postgres_volume:
+
+  electrical_chroma_volume:
+
+  electrical_minio_volume:
+
+networks:
+
+  electrical_network:
+    driver: bridge
