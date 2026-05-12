@@ -1,10 +1,4 @@
-from sqlalchemy import Column
-
-from sqlalchemy import Float
-
-from sqlalchemy import Integer
-
-from sqlalchemy import String
+from sqlalchemy import Column, Float, Integer, String, Text, UniqueConstraint
 
 from app.database import Base
 
@@ -13,49 +7,43 @@ class AmpacityTable(Base):
 
     __tablename__ = "ampacity_tables"
 
-
-    id = Column(
-        Integer,
-        primary_key=True,
-        index=True
+    __table_args__ = (
+        UniqueConstraint(
+            "standard",
+            "material",
+            "insulation",
+            "installation_method",
+            "section_mm2",
+            "conductor_count",
+            "temperature_rating",
+            name="uq_ampacity_reference"
+        ),
     )
 
-    standard = Column(
-        String,
-        nullable=False
-    )
+    id = Column(Integer, primary_key=True, index=True)
 
-    material = Column(
-        String,
-        nullable=False
-    )
+    standard = Column(String(50), nullable=False)
 
-    insulation = Column(
-        String,
-        nullable=False
-    )
+    material = Column(String(50), nullable=False)
 
-    installation_method = Column(
-        String,
-        nullable=False
-    )
+    insulation = Column(String(50), nullable=False)
 
-    section_mm2 = Column(
-        Float,
-        nullable=False
-    )
+    installation_method = Column(String(50), nullable=False)
 
-    ampacity = Column(
-        Float,
-        nullable=False
-    )
+    section_mm2 = Column(Float, nullable=False)
 
-    conductor_count = Column(
-        Integer,
-        default=3
-    )
+    ampacity = Column(Float, nullable=False)
 
-    temperature_rating = Column(
-        Integer,
-        default=90
-    )
+    conductor_count = Column(Integer, default=3)
+
+    temperature_rating = Column(Integer, default=90)
+
+    cable_type = Column(String(50), nullable=True)
+
+    installation_environment = Column(String(100), nullable=True)
+
+    source_document = Column(String(255), nullable=True)
+
+    source_table = Column(String(100), nullable=True)
+
+    notes = Column(Text, nullable=True)
