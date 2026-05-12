@@ -25,4 +25,12 @@ Thumbs.db
 
 # Build
 dist/
-build/
+build/ 
+.env
+*.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+node_modules/
+.next/
