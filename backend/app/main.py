@@ -13,6 +13,7 @@ from app.api.routes.dc_system_routes import router as dc_system_router
 from app.api.routes.solar_bess_routes import router as solar_bess_router
 from app.api.routes.arc_flash_routes import router as arc_flash_router
 from app.api.routes.load_flow_routes import router as load_flow_router
+from app.api.routes.protection_coordination_routes import router as protection_coordination_router
 
 
 app = FastAPI(
@@ -44,6 +45,7 @@ app.include_router(dc_system_router)
 app.include_router(solar_bess_router)
 app.include_router(arc_flash_router)
 app.include_router(load_flow_router)
+app.include_router(protection_coordination_router)
 
 
 @app.get("/")
