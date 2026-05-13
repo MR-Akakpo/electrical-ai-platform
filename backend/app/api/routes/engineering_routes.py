@@ -41,6 +41,10 @@ from app.schemas.ups_schema import (
     UPSAnalysisRequest
 )
 
+from app.schemas.protection_coordination_schema import (
+    ProtectionCoordinationRequest
+)
+
 from app.engineering.generators.generator_engine import (
     run_generator_engineering_analysis
 )
@@ -51,6 +55,10 @@ from app.engineering.transformers.transformer_engine import (
 
 from app.engineering.ups.ups_engine import (
     run_ups_analysis
+)
+
+from app.engineering.protection_coordination.coordination_engine import (
+    run_protection_coordination_analysis
 )
 
 
@@ -155,4 +163,19 @@ def ups_analysis(
         battery_energy_kwh=data.battery_energy_kwh,
         redundancy_topology=data.redundancy_topology,
         redundancy_factor=data.redundancy_factor
+    )
+
+
+@router.post("/protection-coordination")
+def protection_coordination(
+    data: ProtectionCoordinationRequest
+):
+
+    return run_protection_coordination_analysis(
+        upstream_breaker_a=data.upstream_breaker_a,
+        downstream_breaker_a=data.downstream_breaker_a,
+        upstream_icu_ka=data.upstream_icu_ka,
+        downstream_fault_ka=data.downstream_fault_ka,
+        breaker_curve=data.breaker_curve,
+        load_inrush_multiple=data.load_inrush_multiple
     )
