@@ -49,6 +49,10 @@ from app.schemas.power_quality_schema import (
     PowerQualityRequest
 )
 
+from app.schemas.fault_analysis_schema import (
+    FaultAnalysisRequest
+)
+
 from app.engineering.generators.generator_engine import (
     run_generator_engineering_analysis
 )
@@ -67,6 +71,10 @@ from app.engineering.protection_coordination.coordination_engine import (
 
 from app.engineering.power_quality.power_quality_engine import (
     run_power_quality_analysis
+)
+
+from app.engineering.fault_analysis.fault_engine import (
+    run_fault_analysis
 )
 
 
@@ -199,4 +207,23 @@ def power_quality_analysis(
         thdv_percent=data.thdv_percent,
         nonlinear_load_ratio_percent=data.nonlinear_load_ratio_percent,
         ambient_temperature_c=data.ambient_temperature_c
+    )
+
+
+@router.post("/fault-analysis")
+def fault_analysis(
+    data: FaultAnalysisRequest
+):
+
+    return run_fault_analysis(
+        transformer_kva=data.transformer_kva,
+        transformer_voltage_v=data.transformer_voltage_v,
+        transformer_impedance_percent=data.transformer_impedance_percent,
+        generator_kva=data.generator_kva,
+        generator_voltage_v=data.generator_voltage_v,
+        generator_xdpp_percent=data.generator_xdpp_percent,
+        xr_ratio=data.xr_ratio,
+        cable_section_mm2=data.cable_section_mm2,
+        cable_k_factor=data.cable_k_factor,
+        fault_duration_s=data.fault_duration_s
     )
