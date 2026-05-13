@@ -16,6 +16,7 @@ from app.api.routes.load_flow_routes import router as load_flow_router
 from app.api.routes.protection_coordination_routes import router as protection_coordination_router
 from app.api.routes.harmonic_routes import router as harmonic_router
 from app.api.routes.cable_routing_routes import router as cable_routing_router
+from app.api.routes.busbar_routes import router as busbar_router
 
 
 app = FastAPI(
@@ -50,6 +51,7 @@ app.include_router(load_flow_router)
 app.include_router(protection_coordination_router)
 app.include_router(harmonic_router)
 app.include_router(cable_routing_router)
+app.include_router(busbar_router)
 
 
 @app.get("/")
