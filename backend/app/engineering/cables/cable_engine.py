@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+﻿from sqlalchemy.orm import Session
 
 from app.repositories.cable_repository import (
     get_cables
@@ -34,8 +34,6 @@ from app.engineering.cables.recommendations import (
 
 from app.standards.iec.iec_general import (
     IEC_GENERAL
-)
-    generate_cable_recommendations
 )
 
 
@@ -138,7 +136,7 @@ def run_cable_sizing_engine(
             current=current,
             corrected_ampacity=corrected_ampacity,
             voltage_drop_percent=voltage_drop["voltage_drop_percent"],
-            breaker_rating_a=breaker_data["breaker_rating_a"],
+            breaker_rating_a=breaker_data["rated_current_a"],
             max_voltage_drop_percent=max_voltage_drop_percent
         )
 
@@ -146,39 +144,77 @@ def run_cable_sizing_engine(
             voltage_drop_percent=voltage_drop["voltage_drop_percent"],
             corrected_ampacity=corrected_ampacity,
             current=current,
-            breaker_rating_a=breaker_data["breaker_rating_a"],
+            breaker_rating_a=breaker_data["rated_current_a"],
             material=material,
             max_voltage_drop_percent=max_voltage_drop_percent
         )
 
         option = {
-            "section_mm2": cable.section_mm2,
-            "ampacity": base_ampacity,
-            "corrected_ampacity": round(corrected_ampacity, 2),
-            "recommended_breaker_a": breaker_data["breaker_rating_a"],
-            "breaker": breaker_data,
-            "short_circuit": short_circuit,
-            "material": material,
-            "insulation": insulation,
-            "cable_type": cable_type,
-            "installation_method": installation_method,
-            "voltage_drop": voltage_drop,
-            "validation": validation,
-            "recommendations": recommendations
+
+            "section_mm2":
+                cable.section_mm2,
+
+            "ampacity":
+                base_ampacity,
+
+            "corrected_ampacity":
+                round(corrected_ampacity, 2),
+
+            "recommended_breaker":
+                breaker_data,
+
+            "short_circuit":
+                short_circuit,
+
+            "material":
+                material,
+
+            "insulation":
+                insulation,
+
+            "cable_type":
+                cable_type,
+
+            "installation_method":
+                installation_method,
+
+            "voltage_drop":
+                voltage_drop,
+
+            "validation":
+                validation,
+
+            "recommendations":
+                recommendations
         }
 
         evaluated_options.append(option)
 
         if validation["compliant"]:
+
             return {
-                "selected": option,
-                "evaluated_options_count": len(evaluated_options),
-                "compliant": True
+
+                "selected":
+                    option,
+
+                "evaluated_options_count":
+                    len(evaluated_options),
+
+                "compliant":
+                    True
             }
 
     return {
-        "selected": None,
-        "evaluated_options_count": len(evaluated_options),
-        "compliant": False,
-        "message": "No compliant cable found for the provided engineering assumptions."
+
+        "selected":
+            None,
+
+        "evaluated_options_count":
+            len(evaluated_options),
+
+        "compliant":
+            False,
+
+        "message":
+            "No compliant cable found for the provided engineering assumptions."
     }
