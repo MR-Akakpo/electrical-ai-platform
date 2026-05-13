@@ -37,12 +37,20 @@ from app.schemas.transformer_schema import (
     TransformerAnalysisRequest
 )
 
+from app.schemas.ups_schema import (
+    UPSAnalysisRequest
+)
+
 from app.engineering.generators.generator_engine import (
     run_generator_engineering_analysis
 )
 
 from app.engineering.transformers.transformer_engine import (
     run_transformer_analysis
+)
+
+from app.engineering.ups.ups_engine import (
+    run_ups_analysis
 )
 
 
@@ -133,4 +141,18 @@ def transformer_analysis(
         connected_load_kw=data.connected_load_kw,
         power_factor=data.power_factor,
         phase=data.phase
+    )
+
+
+@router.post("/ups-analysis")
+def ups_analysis(
+    data: UPSAnalysisRequest
+):
+
+    return run_ups_analysis(
+        critical_load_kw=data.critical_load_kw,
+        power_factor=data.power_factor,
+        battery_energy_kwh=data.battery_energy_kwh,
+        redundancy_topology=data.redundancy_topology,
+        redundancy_factor=data.redundancy_factor
     )
