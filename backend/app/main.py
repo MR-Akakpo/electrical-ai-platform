@@ -5,6 +5,7 @@ from app.api.routes.project_routes import router as project_router
 from app.api.routes.cable_routes import router as cable_router
 from app.api.routes.engineering_routes import router as engineering_router
 from app.api.routes.ai_routes import router as ai_router
+from app.api.routes.document_routes import router as document_router
 
 
 app = FastAPI(
@@ -28,6 +29,7 @@ app.include_router(project_router)
 app.include_router(cable_router)
 app.include_router(engineering_router)
 app.include_router(ai_router)
+app.include_router(document_router)
 
 
 @app.get("/")
