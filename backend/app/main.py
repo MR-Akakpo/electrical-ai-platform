@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+﻿from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.routes.project_routes import router as project_router
@@ -8,6 +8,7 @@ from app.api.routes.engineering_routes import router as engineering_router
 
 app = FastAPI(
     title="Electrical AI Platform API",
+    description="High-level backend for electrical engineering sizing, protection, standards, and future AI/RAG integration.",
     version="0.1.0"
 )
 
@@ -31,5 +32,6 @@ app.include_router(engineering_router)
 def root():
 
     return {
-        "message": "Electrical AI Platform API Running"
+        "message": "Electrical AI Platform API Running",
+        "status": "online"
     }

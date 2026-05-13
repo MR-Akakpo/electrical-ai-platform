@@ -1,4 +1,4 @@
-from app.database import Base, engine
+﻿from app.database import Base, engine
 
 from app.models.project import Project
 from app.models.cable_model import Cable

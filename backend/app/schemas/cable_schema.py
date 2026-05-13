@@ -1,22 +1,21 @@
-from pydantic import BaseModel
+﻿from pydantic import BaseModel, Field
 
 
 class CableSizingRequest(BaseModel):
 
-    power_kw: float
+    power_kw: float = Field(gt=0)
+    voltage: float = Field(gt=0)
+    power_factor: float = Field(gt=0, le=1)
+    phase: str = "three"
 
-    voltage: float
+    length_m: float = Field(gt=0)
 
-    power_factor: float
+    temperature: int = 30
+    grouping_circuits: int = 1
 
-    phase: str
+    installation_method: str = "C"
+    material: str = "copper"
+    insulation: str = "xlpe"
+    cable_type: str = "multicore"
 
-    length_m: float
-
-    temperature_factor: float
-
-    grouping_factor: float
-
-    installation_method: str
-
-    material: str
+    fault_time_s: float = 0.2
