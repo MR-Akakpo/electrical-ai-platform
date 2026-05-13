@@ -1,51 +1,17 @@
-from sqlalchemy.orm import Session
+﻿from sqlalchemy.orm import Session
 
-from app.repositories.cable_repository import (
-    get_cables
-)
-
-from app.services.calculations.cables.ampacity import (
-    get_ampacity
-)
-
-from app.services.calculations.cables.correction_factors import (
-    apply_correction_factors
-)
-
-from app.services.calculations.cables.voltage_drop import (
-    calculate_voltage_drop
-)
-
-from app.services.calculations.cables.short_circuit import (
-    calculate_short_circuit_capacity
-)
-
-from app.services.calculations.protection.breaker_selection import (
-    select_breaker
-)
-
-from app.engineering.cables.validators import (
-    validate_cable_sizing
-)
-
-from app.engineering.cables.recommendations import (
-    generate_cable_recommendations
-)
-
-from app.standards.iec.iec_general import (
-    IEC_GENERAL
-)
-
-from app.engineering.cables.cable_environment_rules import (
-    evaluate_environment_requirements
-)
-    IEC_GENERAL
-)
+from app.repositories.cable_repository import get_cables
+from app.services.calculations.cables.ampacity import get_ampacity
+from app.services.calculations.cables.correction_factors import apply_correction_factors
+from app.services.calculations.cables.voltage_drop import calculate_voltage_drop
+from app.services.calculations.cables.short_circuit import calculate_short_circuit_capacity
+from app.services.calculations.protection.breaker_selection import select_breaker
+from app.engineering.cables.validators import validate_cable_sizing
+from app.engineering.cables.recommendations import generate_cable_recommendations
+from app.engineering.cables.cable_environment_rules import evaluate_environment_requirements
 
 
-def installation_method_factor(
-    method: str
-):
+def installation_method_factor(method: str):
 
     factors = {
         "A": 0.89,
@@ -54,10 +20,7 @@ def installation_method_factor(
         "D": 1.12
     }
 
-    return factors.get(
-        method,
-        1.0
-    )
+    return factors.get(method, 1.0)
 
 
 def run_cable_sizing_engine(
@@ -74,7 +37,10 @@ def run_cable_sizing_engine(
     insulation: str = "xlpe",
     cable_type: str = "multicore",
     fault_time_s: float = 0.2,
-    max_voltage_drop_percent: float = 5.0
+    max_voltage_drop_percent: float = 5.0,
+    environment: str = "industrial",
+    load_type: str = "power",
+    harmonic_content_percent: float = 0
 ):
 
     cables = get_cables(
@@ -83,9 +49,7 @@ def run_cable_sizing_engine(
         installation_method=installation_method
     )
 
-    installation_factor = installation_method_factor(
-        installation_method
-    )
+    installation_factor = installation_method_factor(installation_method)
 
     evaluated_options = []
 
@@ -102,6 +66,13 @@ def run_cable_sizing_engine(
         if base_ampacity <= 0:
             continue
 
+        harmonic_derating = 1.0
+
+        if harmonic_content_percent >= 33:
+            harmonic_derating = 0.8
+        elif harmonic_content_percent >= 15:
+            harmonic_derating = 0.9
+
         corrected_ampacity = (
             apply_correction_factors(
                 db=db,
@@ -110,6 +81,7 @@ def run_cable_sizing_engine(
                 circuits=grouping_circuits
             )
             * installation_factor
+            * harmonic_derating
         )
 
         breaker_data = select_breaker(
@@ -155,85 +127,43 @@ def run_cable_sizing_engine(
             max_voltage_drop_percent=max_voltage_drop_percent
         )
 
+        environment_analysis = evaluate_environment_requirements(
+            environment=environment,
+            load_type=load_type
+        )
+
         option = {
-
-            "section_mm2":
-                cable.section_mm2,
-
-            "ampacity":
-                base_ampacity,
-
-            "corrected_ampacity":
-                round(corrected_ampacity, 2),
-
-            "recommended_breaker":
-                breaker_data,
-
-            "short_circuit":
-                short_circuit,
-
-            "material":
-                material,
-
-            "insulation":
-                insulation,
-
-            "cable_type":
-                cable_type,
-
-            "installation_method":
-                installation_method,
-
-            "voltage_drop":
-                voltage_drop,
-
-            "validation":
-                validation,
-
-            "recommendations":
-                recommendations
+            "section_mm2": cable.section_mm2,
+            "ampacity": base_ampacity,
+            "corrected_ampacity": round(corrected_ampacity, 2),
+            "harmonic_derating": harmonic_derating,
+            "recommended_breaker": breaker_data,
+            "recommended_breaker_a": breaker_data["rated_current_a"],
+            "short_circuit": short_circuit,
+            "material": material,
+            "insulation": insulation,
+            "cable_type": cable_type,
+            "installation_method": installation_method,
+            "environment": environment,
+            "load_type": load_type,
+            "voltage_drop": voltage_drop,
+            "validation": validation,
+            "environment_analysis": environment_analysis,
+            "recommendations": recommendations
         }
 
         evaluated_options.append(option)
 
         if validation["compliant"]:
-
             return {
-
-                "selected":
-                    option,
-
-                "evaluated_options_count":
-                    len(evaluated_options),
-
-                "compliant":
-                    True
+                "selected": option,
+                "evaluated_options_count": len(evaluated_options),
+                "compliant": True
             }
 
     return {
-
-        "selected":
-            None,
-
-        "evaluated_options_count":
-            len(evaluated_options),
-
-        "compliant":
-            False,
-
-        "message":
-            "No compliant cable found for the provided engineering assumptions."
+        "selected": None,
+        "evaluated_options_count": len(evaluated_options),
+        "compliant": False,
+        "message": "No compliant cable found for the provided engineering assumptions."
     }
-
-
-
-
-def generate_environmental_analysis(
-    environment: str,
-    load_type: str
-):
-
-    return evaluate_environment_requirements(
-        environment=environment,
-        load_type=load_type
-    )
