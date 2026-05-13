@@ -1,4 +1,4 @@
-﻿from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session
 
 from app.repositories.cable_repository import (
     get_cables
@@ -33,6 +33,12 @@ from app.engineering.cables.recommendations import (
 )
 
 from app.standards.iec.iec_general import (
+    IEC_GENERAL
+)
+
+from app.engineering.cables.cable_environment_rules import (
+    evaluate_environment_requirements
+)
     IEC_GENERAL
 )
 
@@ -218,3 +224,16 @@ def run_cable_sizing_engine(
         "message":
             "No compliant cable found for the provided engineering assumptions."
     }
+
+
+
+
+def generate_environmental_analysis(
+    environment: str,
+    load_type: str
+):
+
+    return evaluate_environment_requirements(
+        environment=environment,
+        load_type=load_type
+    )
