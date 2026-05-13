@@ -8,6 +8,7 @@ from app.models.calculation_history_model import CalculationHistory
 from app.models.protection_device_model import ProtectionDevice
 from app.models.load_profile_model import LoadProfile
 from app.models.engineering_standard_model import EngineeringStandard
+from app.models.document_metadata_model import DocumentMetadata
 
 
 Base.metadata.create_all(bind=engine)
