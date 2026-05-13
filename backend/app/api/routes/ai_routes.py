@@ -7,7 +7,8 @@ from app.ai.document_analysis.engineering_knowledge_service import (
 )
 
 from app.ai.vectorstore.vector_store_manager import (
-    vectorstore_status
+    semantic_search,
+    vectorstore_statistics
 )
 
 
@@ -42,4 +43,14 @@ def process_engineering_document(
 @router.get("/vectorstore/status")
 def get_vectorstore_status():
 
-    return vectorstore_status()
+    return vectorstore_statistics()
+
+
+@router.get("/semantic-search")
+def engineering_semantic_search(
+    query: str
+):
+
+    return semantic_search(
+        query=query
+    )

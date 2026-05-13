@@ -8,6 +8,11 @@ from app.documents.parsers.text_extractor import (
     extract_text_basic
 )
 
+from app.ai.vectorstore.vector_store_manager import (
+    add_document_to_vectorstore,
+    vectorstore_statistics
+)
+
 
 PROCESSED_DIR = Path(
     "app/knowledge/processed_documents"
@@ -41,10 +46,24 @@ def process_document(
         encoding="utf-8"
     )
 
+    vector_result = add_document_to_vectorstore(
+        document_name=source.stem,
+        text=text
+    )
+
     return {
-        "source_path": source_path,
-        "extracted_text_path": str(output_path),
-        "characters": len(text)
+
+        "source_path":
+            source_path,
+
+        "extracted_text_path":
+            str(output_path),
+
+        "characters":
+            len(text),
+
+        "vectorstore":
+            vector_result
     }
 
 
@@ -53,7 +72,16 @@ def knowledge_status():
     documents = scan_engineering_documents()
 
     return {
-        "raw_documents_count": len(documents),
-        "raw_documents": documents,
-        "status": "document_architecture_ready"
+
+        "raw_documents_count":
+            len(documents),
+
+        "raw_documents":
+            documents,
+
+        "vectorstore":
+            vectorstore_statistics(),
+
+        "status":
+            "engineering_ai_ready"
     }
