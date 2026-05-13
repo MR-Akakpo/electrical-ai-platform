@@ -1,4 +1,4 @@
-﻿from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session
 
 from app.repositories.cable_repository import (
     get_cables
@@ -29,6 +29,12 @@ from app.engineering.cables.validators import (
 )
 
 from app.engineering.cables.recommendations import (
+    generate_cable_recommendations
+)
+
+from app.standards.iec.iec_general import (
+    IEC_GENERAL
+)
     generate_cable_recommendations
 )
 
