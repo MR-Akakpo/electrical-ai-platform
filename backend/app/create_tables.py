@@ -9,6 +9,8 @@ from app.models.protection_device_model import ProtectionDevice
 from app.models.load_profile_model import LoadProfile
 from app.models.engineering_standard_model import EngineeringStandard
 from app.models.document_metadata_model import DocumentMetadata
+from app.models.cable_application_profile_model import CableApplicationProfile
+from app.models.electrical_network_model import ElectricalNetwork
 
 
 Base.metadata.create_all(bind=engine)
