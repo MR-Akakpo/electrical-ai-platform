@@ -69,12 +69,20 @@ from app.schemas.grounding_schema import (
     GroundingAnalysisRequest
 )
 
+from app.schemas.lighting_schema import (
+    LightingAnalysisRequest
+)
+
 from app.schemas.motor_schema import (
     MotorAnalysisRequest
 )
 
 from app.schemas.grounding_schema import (
     GroundingAnalysisRequest
+)
+
+from app.schemas.lighting_schema import (
+    LightingAnalysisRequest
 )
 
 from app.engineering.generators.generator_engine import (
@@ -117,12 +125,20 @@ from app.engineering.grounding.grounding_engine import (
     analyze_earthing_system
 )
 
+from app.engineering.lighting.lighting_engine import (
+    analyze_lighting_installation
+)
+
 from app.engineering.motors.motor_engine import (
     run_motor_engineering_analysis
 )
 
 from app.engineering.grounding.grounding_engine import (
     analyze_earthing_system
+)
+
+from app.engineering.lighting.lighting_engine import (
+    analyze_lighting_installation
 )
 
 
@@ -349,4 +365,19 @@ def grounding_analysis(
         fault_current_a=data.fault_current_a,
         earth_resistance_ohm=data.earth_resistance_ohm,
         touch_voltage_limit_v=data.touch_voltage_limit_v
+    )
+
+
+@router.post("/lighting-analysis")
+def lighting_analysis(
+    data: LightingAnalysisRequest
+):
+
+    return analyze_lighting_installation(
+        area_m2=data.area_m2,
+        target_lux=data.target_lux,
+        luminaire_efficiency_lm_w=data.luminaire_efficiency_lm_w,
+        maintenance_factor=data.maintenance_factor,
+        utilization_factor=data.utilization_factor,
+        emergency_lighting_required=data.emergency_lighting_required
     )
