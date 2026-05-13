@@ -45,6 +45,10 @@ from app.schemas.protection_coordination_schema import (
     ProtectionCoordinationRequest
 )
 
+from app.schemas.power_quality_schema import (
+    PowerQualityRequest
+)
+
 from app.engineering.generators.generator_engine import (
     run_generator_engineering_analysis
 )
@@ -59,6 +63,10 @@ from app.engineering.ups.ups_engine import (
 
 from app.engineering.protection_coordination.coordination_engine import (
     run_protection_coordination_analysis
+)
+
+from app.engineering.power_quality.power_quality_engine import (
+    run_power_quality_analysis
 )
 
 
@@ -178,4 +186,17 @@ def protection_coordination(
         downstream_fault_ka=data.downstream_fault_ka,
         breaker_curve=data.breaker_curve,
         load_inrush_multiple=data.load_inrush_multiple
+    )
+
+
+@router.post("/power-quality")
+def power_quality_analysis(
+    data: PowerQualityRequest
+):
+
+    return run_power_quality_analysis(
+        thdi_percent=data.thdi_percent,
+        thdv_percent=data.thdv_percent,
+        nonlinear_load_ratio_percent=data.nonlinear_load_ratio_percent,
+        ambient_temperature_c=data.ambient_temperature_c
     )
