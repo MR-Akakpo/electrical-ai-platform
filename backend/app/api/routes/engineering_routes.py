@@ -33,8 +33,16 @@ from app.schemas.generator_schema import (
     GeneratorAnalysisRequest
 )
 
+from app.schemas.transformer_schema import (
+    TransformerAnalysisRequest
+)
+
 from app.engineering.generators.generator_engine import (
     run_generator_engineering_analysis
+)
+
+from app.engineering.transformers.transformer_engine import (
+    run_transformer_analysis
 )
 
 
@@ -109,4 +117,20 @@ def generator_analysis(
         fuel_consumption_lph=data.fuel_consumption_lph,
         load_type=data.load_type,
         redundancy_type=data.redundancy_type
+    )
+
+
+@router.post("/transformer-analysis")
+def transformer_analysis(
+    data: TransformerAnalysisRequest
+):
+
+    return run_transformer_analysis(
+        transformer_kva=data.transformer_kva,
+        primary_voltage_v=data.primary_voltage_v,
+        secondary_voltage_v=data.secondary_voltage_v,
+        impedance_percent=data.impedance_percent,
+        connected_load_kw=data.connected_load_kw,
+        power_factor=data.power_factor,
+        phase=data.phase
     )
