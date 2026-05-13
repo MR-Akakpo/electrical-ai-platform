@@ -65,6 +65,10 @@ from app.schemas.motor_schema import (
     MotorAnalysisRequest
 )
 
+from app.schemas.motor_schema import (
+    MotorAnalysisRequest
+)
+
 from app.engineering.generators.generator_engine import (
     run_generator_engineering_analysis
 )
@@ -95,6 +99,10 @@ from app.engineering.equipment_selection.equipment_selection_engine import (
 
 from app.engineering.reactive_power.reactive_power_engine import (
     run_reactive_power_analysis
+)
+
+from app.engineering.motors.motor_engine import (
+    run_motor_engineering_analysis
 )
 
 from app.engineering.motors.motor_engine import (
@@ -282,6 +290,21 @@ def reactive_power_analysis(
         generator_present=data.generator_present,
         generator_kva=data.generator_kva,
         thdi_percent=data.thdi_percent
+    )
+
+
+@router.post("/motor-analysis")
+def motor_analysis(
+    data: MotorAnalysisRequest
+):
+
+    return run_motor_engineering_analysis(
+        motor_power_kw=data.motor_power_kw,
+        voltage_v=data.voltage_v,
+        power_factor=data.power_factor,
+        efficiency=data.efficiency,
+        starting_method=data.starting_method,
+        generator_kva=data.generator_kva
     )
 
 
