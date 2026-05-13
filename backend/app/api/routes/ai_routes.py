@@ -11,6 +11,10 @@ from app.ai.vectorstore.vector_store_manager import (
     vectorstore_statistics
 )
 
+from app.ai.copilot.engineering_copilot import (
+    engineering_copilot_preview
+)
+
 
 router = APIRouter(
     prefix="/ai",
@@ -52,5 +56,15 @@ def engineering_semantic_search(
 ):
 
     return semantic_search(
+        query=query
+    )
+
+
+@router.get("/copilot/preview")
+def copilot_preview(
+    query: str
+):
+
+    return engineering_copilot_preview(
         query=query
     )
