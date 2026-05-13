@@ -53,6 +53,10 @@ from app.schemas.fault_analysis_schema import (
     FaultAnalysisRequest
 )
 
+from app.schemas.equipment_selection_schema import (
+    EquipmentSelectionRequest
+)
+
 from app.engineering.generators.generator_engine import (
     run_generator_engineering_analysis
 )
@@ -75,6 +79,10 @@ from app.engineering.power_quality.power_quality_engine import (
 
 from app.engineering.fault_analysis.fault_engine import (
     run_fault_analysis
+)
+
+from app.engineering.equipment_selection.equipment_selection_engine import (
+    run_equipment_selection
 )
 
 
@@ -226,4 +234,20 @@ def fault_analysis(
         cable_section_mm2=data.cable_section_mm2,
         cable_k_factor=data.cable_k_factor,
         fault_duration_s=data.fault_duration_s
+    )
+
+
+@router.post("/equipment-selection")
+def equipment_selection(
+    data: EquipmentSelectionRequest
+):
+
+    return run_equipment_selection(
+        application=data.application,
+        load_type=data.load_type,
+        load_current_a=data.load_current_a,
+        voltage_level=data.voltage_level,
+        current_type=data.current_type,
+        short_circuit_level_ka=data.short_circuit_level_ka,
+        criticality=data.criticality
     )
