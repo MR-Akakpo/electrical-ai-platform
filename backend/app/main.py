@@ -8,6 +8,7 @@ from app.api.routes.ai_routes import router as ai_router
 from app.api.routes.document_routes import router as document_router
 from app.api.routes.network_routes import router as network_router
 from app.api.routes.switchboard_routes import router as switchboard_router
+from app.api.routes.mv_switchgear_routes import router as mv_switchgear_router
 
 
 app = FastAPI(
@@ -34,6 +35,7 @@ app.include_router(ai_router)
 app.include_router(document_router)
 app.include_router(network_router)
 app.include_router(switchboard_router)
+app.include_router(mv_switchgear_router)
 
 
 @app.get("/")
