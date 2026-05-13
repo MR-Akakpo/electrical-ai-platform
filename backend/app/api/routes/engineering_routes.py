@@ -57,6 +57,10 @@ from app.schemas.equipment_selection_schema import (
     EquipmentSelectionRequest
 )
 
+from app.schemas.reactive_power_schema import (
+    ReactivePowerRequest
+)
+
 from app.engineering.generators.generator_engine import (
     run_generator_engineering_analysis
 )
@@ -83,6 +87,10 @@ from app.engineering.fault_analysis.fault_engine import (
 
 from app.engineering.equipment_selection.equipment_selection_engine import (
     run_equipment_selection
+)
+
+from app.engineering.reactive_power.reactive_power_engine import (
+    run_reactive_power_analysis
 )
 
 
@@ -250,4 +258,20 @@ def equipment_selection(
         current_type=data.current_type,
         short_circuit_level_ka=data.short_circuit_level_ka,
         criticality=data.criticality
+    )
+
+
+@router.post("/reactive-power-analysis")
+def reactive_power_analysis(
+    data: ReactivePowerRequest
+):
+
+    return run_reactive_power_analysis(
+        active_power_kw=data.active_power_kw,
+        initial_power_factor=data.initial_power_factor,
+        target_power_factor=data.target_power_factor,
+        harmonic_environment=data.harmonic_environment,
+        generator_present=data.generator_present,
+        generator_kva=data.generator_kva,
+        thdi_percent=data.thdi_percent
     )
