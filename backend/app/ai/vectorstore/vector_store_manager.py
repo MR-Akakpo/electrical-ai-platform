@@ -4,9 +4,12 @@ import chromadb
 
 from sentence_transformers import SentenceTransformer
 
+from app.core.config.settings import (
+    settings
+)
 
 VECTOR_DB_PATH = Path(
-    "backend/app/knowledge/vector_db"
+    settings.VECTOR_DB_PATH
 )
 
 VECTOR_DB_PATH.mkdir(

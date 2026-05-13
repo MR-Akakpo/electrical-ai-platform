@@ -1,19 +1,13 @@
-﻿import os
-
-from dotenv import load_dotenv
-from sqlalchemy import create_engine
+﻿from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-
-load_dotenv()
-
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql://electrical_admin:electrical_secure_password@localhost:5433/electrical_ai_database"
+from app.core.config.settings import (
+    settings
 )
 
+
 engine = create_engine(
-    DATABASE_URL,
+    settings.DATABASE_URL,
     pool_pre_ping=True
 )
 
