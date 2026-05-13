@@ -11,6 +11,7 @@ from app.api.routes.switchboard_routes import router as switchboard_router
 from app.api.routes.mv_switchgear_routes import router as mv_switchgear_router
 from app.api.routes.dc_system_routes import router as dc_system_router
 from app.api.routes.solar_bess_routes import router as solar_bess_router
+from app.api.routes.arc_flash_routes import router as arc_flash_router
 
 
 app = FastAPI(
@@ -40,6 +41,7 @@ app.include_router(switchboard_router)
 app.include_router(mv_switchgear_router)
 app.include_router(dc_system_router)
 app.include_router(solar_bess_router)
+app.include_router(arc_flash_router)
 
 
 @app.get("/")
