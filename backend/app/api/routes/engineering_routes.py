@@ -65,8 +65,16 @@ from app.schemas.motor_schema import (
     MotorAnalysisRequest
 )
 
+from app.schemas.grounding_schema import (
+    GroundingAnalysisRequest
+)
+
 from app.schemas.motor_schema import (
     MotorAnalysisRequest
+)
+
+from app.schemas.grounding_schema import (
+    GroundingAnalysisRequest
 )
 
 from app.engineering.generators.generator_engine import (
@@ -105,8 +113,16 @@ from app.engineering.motors.motor_engine import (
     run_motor_engineering_analysis
 )
 
+from app.engineering.grounding.grounding_engine import (
+    analyze_earthing_system
+)
+
 from app.engineering.motors.motor_engine import (
     run_motor_engineering_analysis
+)
+
+from app.engineering.grounding.grounding_engine import (
+    analyze_earthing_system
 )
 
 
@@ -320,4 +336,17 @@ def motor_analysis(
         efficiency=data.efficiency,
         starting_method=data.starting_method,
         generator_kva=data.generator_kva
+    )
+
+
+@router.post("/grounding-analysis")
+def grounding_analysis(
+    data: GroundingAnalysisRequest
+):
+
+    return analyze_earthing_system(
+        earthing_system=data.earthing_system,
+        fault_current_a=data.fault_current_a,
+        earth_resistance_ohm=data.earth_resistance_ohm,
+        touch_voltage_limit_v=data.touch_voltage_limit_v
     )
