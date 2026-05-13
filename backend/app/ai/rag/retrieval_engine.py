@@ -10,28 +10,6 @@ def retrieve_engineering_context(
 
     results = semantic_search(
         query=query,
-       
-# =========================================================
-# CONTINUE RAG RETRIEVAL CORE
-# =========================================================
-
-# ---------------------------------------------------------
-# retrieval_engine.py
-# ---------------------------------------------------------
-
-@'
-from app.ai.vectorstore.vector_store_manager import (
-    semantic_search
-)
-
-
-def retrieve_engineering_context(
-    query: str,
-    top_k: int = 5
-):
-
-    results = semantic_search(
-        query=query,
         top_k=top_k
     )
 
