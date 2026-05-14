@@ -12,6 +12,14 @@ from app.schemas.manufacturer_catalog_schema import (
     ManufacturerCatalogItemResponse
 )
 
+from app.schemas.catalog_recommendation_schema import (
+    CatalogRecommendationRequest
+)
+
+from app.engineering.catalogs.catalog_recommendation_engine import (
+    recommend_catalog_equipment
+)
+
 
 router = APIRouter(
     prefix="/catalog",
@@ -57,4 +65,18 @@ def search_equipment_catalog(
         product_type=product_type,
         manufacturer=manufacturer,
         min_current_a=min_current_a
+    )
+
+
+@router.post("/equipment/recommend")
+def recommend_equipment_from_catalog(
+    data: CatalogRecommendationRequest,
+    db: Session = Depends(get_db)
+):
+
+    return recommend_catalog_equipment(
+        db=db,
+        product_type=data.product_type,
+        load_current_a=data.load_current_a,
+        manufacturer=data.manufacturer
     )
