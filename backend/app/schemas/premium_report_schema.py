@@ -1,25 +1,31 @@
 ﻿from pydantic import BaseModel
+from typing import Dict, List, Optional
 
 
-class PremiumReportSection(BaseModel):
-
-    title: str
-
-    content: str | list
-
-
-class PremiumReportRequest(BaseModel):
-
-    file_name: str
-
-    report_title: str
+class PremiumEngineeringReportRequest(
+    BaseModel
+):
 
     project_name: str
 
-    company_name: str
+    report_title: str
 
-    sections: list[PremiumReportSection]
+    company_name: Optional[str] = None
 
-    export_format: str = "pdf"
+    include_logo_1: bool = False
 
-    logos: list[str] = []
+    include_logo_2: bool = False
+
+    executive_summary: Optional[str] = ""
+
+    technical_sections: List[Dict] = []
+
+    kpis: Dict = {}
+
+    compliance_score: float = 0
+
+    compliance_status: str = "UNKNOWN"
+
+    recommendations: List[str] = []
+
+    appendices: List[Dict] = []
