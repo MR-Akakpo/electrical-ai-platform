@@ -16,4 +16,6 @@ class UnifiedExportRequest(
 ):
     title: str
     project_name: str
+    study_type: str = "general"
     sections: List[ExportSection]
+

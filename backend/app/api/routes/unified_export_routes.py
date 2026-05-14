@@ -22,8 +22,10 @@ def export_pdf(
     return build_engineering_pdf_report(
         title=request.title,
         project_name=request.project_name,
+        study_type=request.study_type,
         sections=[
             section.dict()
             for section in request.sections
         ],
     )
+

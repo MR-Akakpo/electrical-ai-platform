@@ -14,6 +14,10 @@ from reportlab.platypus import (
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 
+from app.engineering.standards.standards_reference_engine import (
+    get_standards_for_study
+)
+
 
 EXPORT_DIR = Path("exports")
 
@@ -26,6 +30,7 @@ def build_engineering_pdf_report(
     title: str,
     project_name: str,
     sections: list,
+    study_type: str = "general",
 ):
 
     file_name = f"{uuid4()}.pdf"
@@ -69,6 +74,50 @@ def build_engineering_pdf_report(
     elements.append(
         Spacer(1, 20)
     )
+
+    standards =
+        get_standards_for_study(
+            study_type
+        )
+
+    if standards["status"] == "FOUND":
+
+        elements.append(
+            Paragraph(
+                "Applicable Standards",
+                styles["Heading2"]
+            )
+        )
+
+        elements.append(
+            Spacer(1, 12)
+        )
+
+        for standard in standards["standards"]:
+
+            standard_text = f"""
+            <b>{standard["code"]}</b><br/>
+            {standard["title"]}<br/>
+            <font size="9">
+            Scope: {standard["scope"]}<br/>
+            Status: {standard["status"]}
+            </font>
+            """
+
+            elements.append(
+                Paragraph(
+                    standard_text,
+                    styles["BodyText"]
+                )
+            )
+
+            elements.append(
+                Spacer(1, 10)
+            )
+
+        elements.append(
+            Spacer(1, 20)
+        )
 
     for section in sections:
 
@@ -123,3 +172,4 @@ def build_engineering_pdf_report(
         "file_name": file_name,
         "file_path": str(output_path),
     }
+
