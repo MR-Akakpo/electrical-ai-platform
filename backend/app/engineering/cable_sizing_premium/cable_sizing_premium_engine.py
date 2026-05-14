@@ -4,6 +4,13 @@ from app.engineering.equipment_selection_engine import (
     build_engineering_recommendation
 )
 
+from app.engineering.cable_iec.iec_correction_engine import (
+    get_installation_factor,
+    get_temperature_factor,
+    get_grouping_factor,
+    get_harmonic_factor,
+)
+
 
 STANDARD_SECTIONS_MM2 = [
     1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120,
@@ -347,4 +354,5 @@ def run_premium_cable_sizing(
         "evaluated_options": evaluated,
         "recommendations": recommendations
     }
+
 
