@@ -21,8 +21,23 @@ def calculate_design_current(
     power_factor: float,
     system_type: str,
     current_type: str,
-    efficiency: float = 1
+    efficiency: float = 1,
+    power_kva: float | None = None,
+    current_a: float | None = None,
+    power_input_type: str = "kw"
 ):
+
+    if current_a is not None and power_input_type.lower() == "current":
+        return round(current_a, 2)
+
+    if power_input_type.lower() == "kva" and power_kva is not None:
+        if current_type.upper() == "DC":
+            return round((power_kva * 1000) / voltage_v, 2)
+
+        if system_type == "three_phase":
+            return round((power_kva * 1000) / (math.sqrt(3) * voltage_v), 2)
+
+        return round((power_kva * 1000) / voltage_v, 2)
 
     if current_type.upper() == "DC":
         return round((power_kw * 1000) / (voltage_v * efficiency), 2)
@@ -220,7 +235,10 @@ def run_premium_cable_sizing(
     thdi_percent: float,
     future_margin_percent: float,
     efficiency: float = 1,
-    parallel_cables: int = 1
+    parallel_cables: int = 1,
+    power_input_type: str = "kw",
+    power_kva: float | None = None,
+    current_a: float | None = None
 ):
 
     design_current = calculate_design_current(
@@ -229,7 +247,10 @@ def run_premium_cable_sizing(
         power_factor=power_factor,
         system_type=system_type,
         current_type=current_type,
-        efficiency=efficiency
+        efficiency=efficiency,
+        power_kva=power_kva,
+        current_a=current_a,
+        power_input_type=power_input_type
     )
 
     required_current = design_current * future_margin_factor(future_margin_percent)
@@ -321,6 +342,9 @@ def run_premium_cable_sizing(
     return {
         "input_summary": {
             "power_kw": power_kw,
+            "power_kva": power_kva,
+            "current_a_input": current_a,
+            "power_input_type": power_input_type,
             "voltage_v": voltage_v,
             "system_type": system_type,
             "current_type": current_type,
@@ -334,3 +358,4 @@ def run_premium_cable_sizing(
         "evaluated_options": evaluated,
         "recommendations": recommendations
     }
+

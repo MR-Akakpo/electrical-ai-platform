@@ -22,6 +22,9 @@ def premium_cable_sizing_analysis(
 
     return run_premium_cable_sizing(
         power_kw=data.power_kw,
+        power_kva=data.power_kva,
+        current_a=data.current_a,
+        power_input_type=data.power_input_type,
         voltage_v=data.voltage_v,
         power_factor=data.power_factor,
         system_type=data.system_type,

@@ -3,7 +3,13 @@
 
 class PremiumCableSizingRequest(BaseModel):
 
-    power_kw: float = Field(gt=0)
+    power_input_type: str = "kw"
+
+    power_kw: float = Field(default=0, ge=0)
+
+    power_kva: float | None = Field(default=None, ge=0)
+
+    current_a: float | None = Field(default=None, ge=0)
 
     voltage_v: float = Field(gt=0)
 
