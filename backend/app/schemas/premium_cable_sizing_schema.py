@@ -3,9 +3,9 @@
 
 class PremiumCableSizingRequest(BaseModel):
 
-    power_input_type: str = "kw"
+    input_mode: str = "kw"
 
-    power_kw: float = Field(default=0, ge=0)
+    power_kw: float | None = Field(default=None, ge=0)
 
     power_kva: float | None = Field(default=None, ge=0)
 
@@ -13,7 +13,7 @@ class PremiumCableSizingRequest(BaseModel):
 
     voltage_v: float = Field(gt=0)
 
-    power_factor: float = Field(default=0.9, gt=0, le=1)
+    power_factor: float | None = Field(default=None, gt=0, le=1)
 
     system_type: str = "three_phase"
 
@@ -23,7 +23,7 @@ class PremiumCableSizingRequest(BaseModel):
 
     insulation_type: str = "xlpe"
 
-    installation_method: str = "cable_tray"
+    installation_method: str = "perforated_tray"
 
     ambient_temperature_c: float = 30
 
@@ -41,10 +41,12 @@ class PremiumCableSizingRequest(BaseModel):
 
     load_type: str = "standard"
 
+    environment: str = "industrial"
+
     thdi_percent: float = Field(default=0, ge=0)
 
     future_margin_percent: float = Field(default=20, ge=0)
 
-    efficiency: float = Field(default=1, gt=0, le=1)
+    efficiency: float | None = Field(default=None, gt=0, le=1)
 
     parallel_cables: int = Field(default=1, gt=0)

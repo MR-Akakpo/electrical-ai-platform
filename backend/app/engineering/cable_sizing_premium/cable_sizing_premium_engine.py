@@ -16,38 +16,52 @@ BASE_AMPACITY_COPPER_XLPE = {
 
 
 def calculate_design_current(
-    power_kw: float,
+    input_mode: str,
     voltage_v: float,
-    power_factor: float,
     system_type: str,
     current_type: str,
-    efficiency: float = 1,
+    power_kw: float | None = None,
     power_kva: float | None = None,
     current_a: float | None = None,
-    power_input_type: str = "kw"
+    power_factor: float | None = None,
+    efficiency: float | None = None
 ):
 
-    if current_a is not None and power_input_type.lower() == "current":
-        return round(current_a, 2)
+    input_mode = input_mode.lower()
+    current_type = current_type.upper()
+    efficiency = efficiency or 1
+    power_factor = power_factor or 1
 
-    if power_input_type.lower() == "kva" and power_kva is not None:
-        if current_type.upper() == "DC":
-            return round((power_kva * 1000) / voltage_v, 2)
+    if input_mode == "current_a":
+        return round(current_a or 0, 2)
+
+    if input_mode == "kva":
+        if current_type == "DC":
+            return round(((power_kva or 0) * 1000) / voltage_v, 2)
 
         if system_type == "three_phase":
-            return round((power_kva * 1000) / (math.sqrt(3) * voltage_v), 2)
+            return round(((power_kva or 0) * 1000) / (math.sqrt(3) * voltage_v), 2)
 
-        return round((power_kva * 1000) / voltage_v, 2)
+        return round(((power_kva or 0) * 1000) / voltage_v, 2)
 
-    if current_type.upper() == "DC":
-        return round((power_kw * 1000) / (voltage_v * efficiency), 2)
+    if input_mode == "kw_kva":
+        if power_kw and power_kva and power_kva > 0:
+            inferred_pf = min(power_kw / power_kva, 1)
+        else:
+            inferred_pf = power_factor
+
+        if system_type == "three_phase":
+            return round(((power_kva or 0) * 1000) / (math.sqrt(3) * voltage_v), 2)
+
+        return round(((power_kva or 0) * 1000) / voltage_v, 2)
+
+    if current_type == "DC":
+        return round(((power_kw or 0) * 1000) / (voltage_v * efficiency), 2)
 
     if system_type == "three_phase":
-        current = (power_kw * 1000) / (math.sqrt(3) * voltage_v * power_factor * efficiency)
-    else:
-        current = (power_kw * 1000) / (voltage_v * power_factor * efficiency)
+        return round(((power_kw or 0) * 1000) / (math.sqrt(3) * voltage_v * power_factor * efficiency), 2)
 
-    return round(current, 2)
+    return round(((power_kw or 0) * 1000) / (voltage_v * power_factor * efficiency), 2)
 
 
 def material_factor(material: str):
@@ -56,18 +70,29 @@ def material_factor(material: str):
 
 def insulation_factor(insulation: str):
     insulation = insulation.lower()
-    if insulation == "xlpe":
-        return 1.0
-    if insulation == "epr":
-        return 0.98
-    if insulation == "pvc":
-        return 0.82
-    return 0.9
+
+    factors = {
+        "xlpe": 1.0,
+        "epr": 0.98,
+        "hepr": 0.98,
+        "pvc": 0.82,
+        "lszh": 0.82,
+        "pe": 0.9,
+        "rubber": 0.88,
+        "mineral": 1.05,
+        "silicone": 0.95,
+        "paper_oil": 0.9,
+    }
+
+    return factors.get(insulation, 0.9)
 
 
 def ambient_temperature_factor(temperature_c: float, insulation: str):
+    insulation = insulation.lower()
 
-    if insulation.lower() in ["xlpe", "epr"]:
+    high_temp = insulation in ["xlpe", "epr", "hepr", "silicone", "mineral"]
+
+    if high_temp:
         if temperature_c <= 30:
             return 1.0
         if temperature_c <= 40:
@@ -88,7 +113,6 @@ def ambient_temperature_factor(temperature_c: float, insulation: str):
 
 
 def grouping_factor(grouped_circuits: int):
-
     if grouped_circuits <= 1:
         return 1.0
     if grouped_circuits == 2:
@@ -101,18 +125,14 @@ def grouping_factor(grouped_circuits: int):
 
 
 def installation_factor(method: str):
-
     method = method.lower()
 
-    if method in ["free_air", "cable_tray", "ladder"]:
+    if method in ["free_air", "perforated_tray", "ladder", "cleats"]:
         return 1.0
-
-    if method in ["conduit", "trunking", "duct"]:
+    if method in ["solid_tray", "conduit", "trunking", "duct", "embedded"]:
         return 0.85
-
-    if method in ["buried", "underground"]:
+    if method in ["buried", "underground", "direct_buried"]:
         return 0.9
-
     if method in ["thermal_insulation"]:
         return 0.65
 
@@ -120,7 +140,6 @@ def installation_factor(method: str):
 
 
 def harmonic_factor(thdi_percent: float):
-
     if thdi_percent >= 40:
         return 0.75
     if thdi_percent >= 25:
@@ -130,51 +149,30 @@ def harmonic_factor(thdi_percent: float):
     return 1.0
 
 
-def future_margin_factor(future_margin_percent: float):
-
-    return 1 + future_margin_percent / 100
-
-
-def voltage_drop_percent(
-    current_a: float,
-    length_m: float,
-    voltage_v: float,
-    section_mm2: float,
-    material: str,
-    power_factor: float,
-    system_type: str,
-    current_type: str
-):
-
+def voltage_drop_percent(current_a, length_m, voltage_v, section_mm2, material, power_factor, system_type, current_type):
     rho = 0.0225 if material.lower() == "copper" else 0.036
-
     resistance = rho * length_m / section_mm2
+    pf = power_factor or 1
 
     if current_type.upper() == "DC":
         drop_v = 2 * current_a * resistance
     elif system_type == "three_phase":
-        drop_v = math.sqrt(3) * current_a * resistance * power_factor
+        drop_v = math.sqrt(3) * current_a * resistance * pf
     else:
-        drop_v = 2 * current_a * resistance * power_factor
+        drop_v = 2 * current_a * resistance * pf
 
     return round((drop_v / voltage_v) * 100, 3)
 
 
-def short_circuit_withstand_a(
-    section_mm2: float,
-    material: str,
-    insulation: str,
-    fault_duration_s: float
-):
-
+def short_circuit_withstand_a(section_mm2, material, insulation, fault_duration_s):
     material = material.lower()
     insulation = insulation.lower()
 
-    if material == "copper" and insulation in ["xlpe", "epr"]:
+    if material == "copper" and insulation in ["xlpe", "epr", "hepr"]:
         k = 143
     elif material == "copper":
         k = 115
-    elif insulation in ["xlpe", "epr"]:
+    elif insulation in ["xlpe", "epr", "hepr"]:
         k = 94
     else:
         k = 76
@@ -182,78 +180,63 @@ def short_circuit_withstand_a(
     return round((k * section_mm2) / math.sqrt(fault_duration_s), 2)
 
 
-def neutral_recommendation(
-    system_type: str,
-    thdi_percent: float,
-    load_type: str
-):
+def load_type_recommendations(load_type: str, environment: str):
+    load_type = load_type.lower()
+    environment = environment.lower()
+    recs = []
 
-    if system_type != "three_phase":
-        return "Neutral sizing to be assessed according to circuit configuration."
+    if load_type in ["motor", "vfd_motor", "pump", "compressor", "fan", "conveyor"]:
+        recs.append("Motor load detected. Verify starting voltage drop, overload protection and coordination.")
+    if load_type in ["vfd_motor", "rectifier", "ups_input", "ev_charger", "welding", "led_lighting", "it_load"]:
+        recs.append("Nonlinear load detected. Harmonic heating and neutral sizing must be reviewed.")
+    if load_type in ["fire_pump", "safety_system", "emergency_lighting"]:
+        recs.append("Safety-critical load detected. Fire resistance, redundancy and emergency supply rules may apply.")
+    if environment in ["data_center", "hospital", "airport", "oil_gas", "mining", "marine"]:
+        recs.append(f"Critical environment detected: {environment}. Apply stricter reliability, maintainability and compliance checks.")
 
-    if thdi_percent >= 33 or load_type.lower() in ["ups", "data_center", "nonlinear"]:
-        return "Oversized neutral conductor recommended due to nonlinear loads and triplen harmonics."
-
-    return "Standard neutral sizing may be acceptable."
-
-
-def protective_conductor_recommendation(
-    section_mm2: float,
-    earthing_system: str
-):
-
-    if earthing_system.upper() == "TN-C":
-        return "PEN conductor requirements must be verified. Minimum PEN section rules apply."
-
-    if section_mm2 <= 16:
-        pe = section_mm2
-    elif section_mm2 <= 35:
-        pe = 16
-    else:
-        pe = section_mm2 / 2
-
-    return f"Recommended preliminary PE section: {pe} mm². Verify with IEC rules and fault loop impedance."
+    return recs
 
 
 def run_premium_cable_sizing(
-    power_kw: float,
-    voltage_v: float,
-    power_factor: float,
-    system_type: str,
-    current_type: str,
-    conductor_material: str,
-    insulation_type: str,
-    installation_method: str,
-    ambient_temperature_c: float,
-    grouped_circuits: int,
-    cable_length_m: float,
-    max_voltage_drop_percent: float,
-    fault_current_ka: float,
-    fault_duration_s: float,
-    earthing_system: str,
-    load_type: str,
-    thdi_percent: float,
-    future_margin_percent: float,
-    efficiency: float = 1,
-    parallel_cables: int = 1,
-    power_input_type: str = "kw",
+    input_mode: str = "kw",
+    power_kw: float | None = None,
     power_kva: float | None = None,
-    current_a: float | None = None
+    current_a: float | None = None,
+    voltage_v: float = 400,
+    power_factor: float | None = None,
+    system_type: str = "three_phase",
+    current_type: str = "AC",
+    conductor_material: str = "copper",
+    insulation_type: str = "xlpe",
+    installation_method: str = "perforated_tray",
+    ambient_temperature_c: float = 30,
+    grouped_circuits: int = 1,
+    cable_length_m: float = 10,
+    max_voltage_drop_percent: float = 5,
+    fault_current_ka: float = 10,
+    fault_duration_s: float = 1,
+    earthing_system: str = "TN-S",
+    load_type: str = "standard",
+    environment: str = "industrial",
+    thdi_percent: float = 0,
+    future_margin_percent: float = 20,
+    efficiency: float | None = None,
+    parallel_cables: int = 1
 ):
 
     design_current = calculate_design_current(
+        input_mode=input_mode,
         power_kw=power_kw,
+        power_kva=power_kva,
+        current_a=current_a,
         voltage_v=voltage_v,
         power_factor=power_factor,
         system_type=system_type,
         current_type=current_type,
-        efficiency=efficiency,
-        power_kva=power_kva,
-        current_a=current_a,
-        power_input_type=power_input_type
+        efficiency=efficiency
     )
 
-    required_current = design_current * future_margin_factor(future_margin_percent)
+    required_current = design_current * (1 + future_margin_percent / 100)
 
     correction_factor = (
         material_factor(conductor_material)
@@ -269,9 +252,7 @@ def run_premium_cable_sizing(
     selected = None
 
     for section in STANDARD_SECTIONS_MM2:
-
         base_ampacity = BASE_AMPACITY_COPPER_XLPE[section]
-
         corrected_ampacity = base_ampacity * correction_factor
 
         vd = voltage_drop_percent(
@@ -280,7 +261,7 @@ def run_premium_cable_sizing(
             voltage_v=voltage_v,
             section_mm2=section,
             material=conductor_material,
-            power_factor=power_factor,
+            power_factor=power_factor or 1,
             system_type=system_type,
             current_type=current_type
         )
@@ -292,22 +273,18 @@ def run_premium_cable_sizing(
             fault_duration_s=fault_duration_s
         )
 
-        short_circuit_ok = withstand >= fault_current_ka * 1000
-        ampacity_ok = corrected_ampacity >= required_current
-        voltage_drop_ok = vd <= max_voltage_drop_percent
-
         option = {
             "section_mm2": section,
             "base_ampacity_a": base_ampacity,
             "corrected_ampacity_a": round(corrected_ampacity, 2),
             "voltage_drop_percent": vd,
             "short_circuit_withstand_a": withstand,
-            "ampacity_ok": ampacity_ok,
-            "voltage_drop_ok": voltage_drop_ok,
-            "short_circuit_ok": short_circuit_ok,
-            "compliant": ampacity_ok and voltage_drop_ok and short_circuit_ok
+            "ampacity_ok": corrected_ampacity >= required_current,
+            "voltage_drop_ok": vd <= max_voltage_drop_percent,
+            "short_circuit_ok": withstand >= fault_current_ka * 1000,
         }
 
+        option["compliant"] = option["ampacity_ok"] and option["voltage_drop_ok"] and option["short_circuit_ok"]
         evaluated.append(option)
 
         if option["compliant"] and selected is None:
@@ -318,37 +295,39 @@ def run_premium_cable_sizing(
     if selected:
         recommendations.append("Selected cable section satisfies ampacity, voltage drop and thermal short-circuit withstand.")
     else:
-        recommendations.append("No compliant standard section found. Consider parallel cables, reduced length, larger section or revised installation method.")
+        recommendations.append("No compliant section found. Consider parallel cables, busbar trunking, reduced length or different installation method.")
 
-    if ambient_temperature_c >= 40:
-        recommendations.append("High ambient temperature detected. Thermal derating applied.")
+    if input_mode == "kva":
+        recommendations.append("Input based on apparent power kVA. Power factor is not required for current calculation, but remains useful for voltage drop accuracy.")
+    if input_mode == "current_a":
+        recommendations.append("Input based on known current. Power and power factor are not mandatory for ampacity sizing.")
+    if power_factor is None:
+        recommendations.append("Power factor not provided. Conservative assumptions may be used for voltage drop.")
+    if efficiency is None:
+        recommendations.append("Efficiency not provided. Motor/equipment efficiency should be confirmed when active power is used.")
 
-    if grouped_circuits >= 3:
-        recommendations.append("Grouped circuits detected. Grouping derating applied.")
+    recommendations.extend(load_type_recommendations(load_type, environment))
 
     if thdi_percent >= 15:
         recommendations.append("Harmonic distortion detected. Cable derating and neutral sizing review required.")
+    if earthing_system.upper() == "TN-C":
+        recommendations.append("TN-C system detected. PEN conductor sizing and continuity must be verified.")
+    if installation_method in ["buried", "underground", "direct_buried"]:
+        recommendations.append("Buried cable detected. Soil thermal resistivity, depth and spacing must be verified.")
 
-    if installation_method.lower() in ["buried", "underground"]:
-        recommendations.append("Buried installation detected. Soil thermal resistivity and burial depth must be verified.")
-
-    if load_type.lower() in ["motor", "vfd"]:
-        recommendations.append("Motor/VFD load detected. Verify starting voltage drop, EMC, shielded cable and protection coordination.")
-
-    recommendations.append(neutral_recommendation(system_type, thdi_percent, load_type))
-    recommendations.append(protective_conductor_recommendation(selected["section_mm2"] if selected else STANDARD_SECTIONS_MM2[-1], earthing_system))
-    recommendations.append("Final validation must use project standards, manufacturer data and applicable IEC installation tables.")
+    recommendations.append("Final validation must use IEC installation tables, manufacturer data and local regulations.")
 
     return {
         "input_summary": {
+            "input_mode": input_mode,
             "power_kw": power_kw,
             "power_kva": power_kva,
-            "current_a_input": current_a,
-            "power_input_type": power_input_type,
+            "current_a": current_a,
             "voltage_v": voltage_v,
             "system_type": system_type,
             "current_type": current_type,
             "load_type": load_type,
+            "environment": environment,
             "earthing_system": earthing_system
         },
         "design_current_a": design_current,
@@ -358,4 +337,3 @@ def run_premium_cable_sizing(
         "evaluated_options": evaluated,
         "recommendations": recommendations
     }
-
