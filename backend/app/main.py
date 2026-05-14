@@ -18,11 +18,12 @@ from app.api.routes.harmonic_routes import router as harmonic_router
 from app.api.routes.cable_routing_routes import router as cable_routing_router
 from app.api.routes.busbar_routes import router as busbar_router
 from app.api.routes.changeover_routes import router as changeover_router
+from app.api.routes.catalog_routes import router as catalog_router
 
 
 app = FastAPI(
     title="Electrical AI Platform API",
-    description="High-level backend for electrical engineering sizing, protection, standards, documents, networks and AI/RAG integration.",
+    description="High-level backend for electrical engineering sizing, protection, standards, documents, networks, catalogs and AI/RAG integration.",
     version="0.1.0"
 )
 
@@ -54,6 +55,7 @@ app.include_router(harmonic_router)
 app.include_router(cable_routing_router)
 app.include_router(busbar_router)
 app.include_router(changeover_router)
+app.include_router(catalog_router)
 
 
 @app.get("/")
