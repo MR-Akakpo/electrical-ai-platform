@@ -1,41 +1,28 @@
 ﻿from app.engineering.short_circuit.short_circuit_engine import (
-    run_short_circuit_study
+    run_short_circuit_analysis
 )
 
 
 def calculate_short_circuit_capacity(
-    section_mm2: float,
-    material: str,
-    insulation: str,
-    fault_time_s: float
+    transformer_power_kva: float,
+    voltage_v: float,
+    impedance_percent: float,
+    xr_ratio: float = 10,
+    breaker_capacity_ka: float = 36,
+    fault_duration_s: float = 1
 ):
 
-    if material == "copper":
-
-        k = 143
-
-    else:
-
-        k = 94
-
-    short_circuit_capacity = (
-        k
-        * section_mm2
-        / (fault_time_s ** 0.5)
+    result = run_short_circuit_analysis(
+        transformer_power_kva=transformer_power_kva,
+        voltage_v=voltage_v,
+        impedance_percent=impedance_percent,
+        xr_ratio=xr_ratio,
+        breaker_capacity_ka=breaker_capacity_ka,
+        fault_duration_s=fault_duration_s
     )
 
-    engineering_fault = run_short_circuit_study(
-        voltage_v=400,
-        short_circuit_power_mva=500,
-        transformer_power_kva=1600,
-        transformer_uk_percent=6
-    )
+    return result
 
-    return {
 
-        "adiabatic_short_circuit_a":
-            round(short_circuit_capacity, 2),
-
-        "engineering_fault_study":
-            engineering_fault
-    }
+# backward compatibility
+run_short_circuit_study = calculate_short_circuit_capacity
