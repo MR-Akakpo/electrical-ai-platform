@@ -35,6 +35,7 @@ ROUTERS = [
     ("app.api.routes.workspace_routes", "workspace_router"),
     ("app.api.routes.report_routes", "report_router"),
     ("app.api.routes.audit_routes", "audit_router"),
+    ("app.api.routes.export_routes", "export_router"),
 ]
 
 
@@ -49,7 +50,6 @@ def register_all_routes(app):
             module = import_module(module_path)
             router = getattr(module, "router")
             app.include_router(router)
-
             loaded_routes.append(module_path)
 
         except Exception as error:
@@ -60,6 +60,3 @@ def register_all_routes(app):
 
     app.state.loaded_routes = loaded_routes
     app.state.skipped_routes = skipped_routes
-
-
-
