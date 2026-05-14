@@ -3,12 +3,24 @@
 
 class UPSAnalysisRequest(BaseModel):
 
-    critical_load_kw: float = Field(gt=0)
+    ups_power_kva: float = Field(gt=0)
 
-    power_factor: float = Field(gt=0, le=1)
+    connected_load_kva: float = Field(gt=0)
 
-    battery_energy_kwh: float = Field(gt=0)
+    connected_load_kw: float = Field(gt=0)
 
-    redundancy_topology: str = "N+1"
+    battery_voltage_v: float = Field(gt=0)
 
-    redundancy_factor: float = Field(default=1.2, gt=0)
+    battery_capacity_ah: float = Field(gt=0)
+
+    dc_bus_efficiency: float = Field(gt=0, le=1)
+
+    redundancy_type: str = "N+1"
+
+    has_static_bypass: bool = True
+
+    has_maintenance_bypass: bool = True
+
+    application: str = "general"
+
+    battery_type: str = "VRLA"
