@@ -31,7 +31,7 @@ ROUTERS = [
     ("app.api.routes.earthing_routes", "earthing_router"),
     ("app.api.routes.reactive_power_routes", "reactive_power_router"),
     ("app.api.routes.motor_routes", "motor_router"),
-    ("app.api.routes.health_routes", "health_router"),
+    ("app.api.routes.health_routes", "health_router"),`n    ("app.api.routes.sld_routes", "sld_router"),
 ]
 
 
@@ -57,3 +57,4 @@ def register_all_routes(app):
 
     app.state.loaded_routes = loaded_routes
     app.state.skipped_routes = skipped_routes
+
