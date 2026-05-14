@@ -7,16 +7,14 @@ class MotorAnalysisRequest(BaseModel):
 
     voltage_v: float = Field(gt=0)
 
-    power_factor: float = Field(
-        gt=0,
-        le=1
-    )
+    efficiency: float = Field(gt=0, le=1)
 
-    efficiency: float = Field(
-        gt=0,
-        le=1
-    )
+    power_factor: float = Field(gt=0, le=1)
+
+    connected_load_kw: float = Field(gt=0)
 
     starting_method: str = "DOL"
 
-    generator_kva: float = Field(gt=0)
+    criticality: str = "standard"
+
+    application: str = "general"
