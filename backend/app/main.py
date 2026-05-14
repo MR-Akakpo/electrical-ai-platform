@@ -1,30 +1,7 @@
 ﻿from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware 
+from fastapi.middleware.cors import CORSMiddleware
 
-
-from app.api.routes.earthing_routes import router as earthing_router
-from app.api.routes.project_routes import router as project_router
-from app.api.routes.cable_routes import router as cable_router
-from app.api.routes.engineering_routes import router as engineering_router
-from app.api.routes.ai_routes import router as ai_router
-from app.api.routes.document_routes import router as document_router
-from app.api.routes.network_routes import router as network_router
-from app.api.routes.switchboard_routes import router as switchboard_router
-from app.api.routes.mv_switchgear_routes import router as mv_switchgear_router
-from app.api.routes.dc_system_routes import router as dc_system_router
-from app.api.routes.solar_bess_routes import router as solar_bess_router
-from app.api.routes.arc_flash_routes import router as arc_flash_router
-from app.api.routes.load_flow_routes import router as load_flow_router
-from app.api.routes.protection_coordination_routes import router as protection_coordination_router
-from app.api.routes.harmonic_routes import router as harmonic_router
-from app.api.routes.cable_routing_routes import router as cable_routing_router
-from app.api.routes.busbar_routes import router as busbar_router
-from app.api.routes.changeover_routes import router as changeover_router
-from app.api.routes.catalog_routes import router as catalog_router
-from app.api.routes.protection_selection_routes import router as protection_selection_router
-from app.api.routes.short_circuit_routes import router as short_circuit_router
-from app.api.routes.health_routes import router as health_router
-from app.api.routes.transformer_routes import router as transformer_router
+from app.api.router_registry import register_all_routes
 
 
 app = FastAPI(
@@ -44,34 +21,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(project_router)
-app.include_router(cable_router)
-app.include_router(engineering_router)
-app.include_router(ai_router)
-app.include_router(document_router)
-app.include_router(network_router)
-app.include_router(switchboard_router)
-app.include_router(mv_switchgear_router)
-app.include_router(dc_system_router)
-app.include_router(solar_bess_router)
-app.include_router(arc_flash_router)
-app.include_router(load_flow_router)
-app.include_router(protection_coordination_router)
-app.include_router(harmonic_router)
-app.include_router(cable_routing_router)
-app.include_router(busbar_router)
-app.include_router(changeover_router)
-app.include_router(catalog_router)
-app.include_router(protection_selection_router)
-app.include_router(short_circuit_router)
-app.include_router(health_router)
-app.include_router(transformer_router)
-app.include_router(earthing_router)
+register_all_routes(app)
+
 
 @app.get("/")
 def root():
 
     return {
         "message": "Electrical AI Platform API Running",
-        "status": "online"
+        "status": "online",
+        "loaded_routes": app.state.loaded_routes,
+        "skipped_routes": app.state.skipped_routes
     }
