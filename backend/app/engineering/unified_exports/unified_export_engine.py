@@ -18,6 +18,10 @@ from app.engineering.standards.standards_reference_engine import (
     get_standards_for_study
 )
 
+from app.document_repository.document_repository_engine import (
+    register_engineering_document
+)
+
 
 EXPORT_DIR = Path("exports")
 
@@ -167,9 +171,20 @@ def build_engineering_pdf_report(
 
     document.build(elements)
 
+    repository_entry =
+        register_engineering_document(
+            study_type=study_type,
+            title=title,
+            project_name=project_name,
+            file_name=file_name,
+            file_path=str(output_path),
+        )
+
     return {
         "status": "success",
         "file_name": file_name,
         "file_path": str(output_path),
+        "repository_entry": repository_entry,
     }
+
 
