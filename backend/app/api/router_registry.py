@@ -33,6 +33,7 @@ ROUTERS = [
     ("app.api.routes.motor_routes", "motor_router"),
     ("app.api.routes.health_routes", "health_router"),
     ("app.api.routes.workspace_routes", "workspace_router"),
+    ("app.api.routes.report_routes", "report_router"),
 ]
 
 
@@ -58,4 +59,5 @@ def register_all_routes(app):
 
     app.state.loaded_routes = loaded_routes
     app.state.skipped_routes = skipped_routes
+
 
