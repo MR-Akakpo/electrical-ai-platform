@@ -12,6 +12,7 @@ from app.models.document_metadata_model import DocumentMetadata
 from app.models.cable_application_profile_model import CableApplicationProfile
 from app.models.electrical_network_model import ElectricalNetwork
 from app.models.manufacturer_catalog_model import ManufacturerCatalogItem
+from app.models.engineering_study_model import EngineeringStudy
 
 
 Base.metadata.create_all(bind=engine)
