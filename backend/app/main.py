@@ -20,11 +20,12 @@ from app.api.routes.busbar_routes import router as busbar_router
 from app.api.routes.changeover_routes import router as changeover_router
 from app.api.routes.catalog_routes import router as catalog_router
 from app.api.routes.protection_selection_routes import router as protection_selection_router
+from app.api.routes.short_circuit_routes import router as short_circuit_router
 
 
 app = FastAPI(
     title="Electrical AI Platform API",
-    description="High-level backend for electrical engineering sizing, protection, standards, catalogs, documents, networks and AI/RAG integration.",
+    description="High-level backend for electrical engineering sizing, protection, catalogs, studies and AI/RAG integration.",
     version="0.1.0"
 )
 
@@ -58,6 +59,7 @@ app.include_router(busbar_router)
 app.include_router(changeover_router)
 app.include_router(catalog_router)
 app.include_router(protection_selection_router)
+app.include_router(short_circuit_router)
 
 
 @app.get("/")
