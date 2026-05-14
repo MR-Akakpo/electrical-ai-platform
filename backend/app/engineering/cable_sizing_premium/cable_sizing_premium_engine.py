@@ -333,6 +333,37 @@ def run_premium_cable_sizing(
         material="Copper" if conductor_material.lower() == "copper" else "Aluminum"
     )
 
+    engineering_justification =
+        build_cable_engineering_justification({
+
+            "design_current":
+                design_current,
+
+            "safety_factor":
+                safety_factor,
+
+            "installation_factor":
+                installation_factor,
+
+            "temperature_factor":
+                temperature_factor,
+
+            "grouping_factor":
+                grouping_factor,
+
+            "harmonic_factor":
+                harmonic_factor,
+
+            "global_derating_factor":
+                global_derating_factor,
+
+            "selected_cable":
+                selected,
+
+            "thermal_short_circuit_validation":
+                thermal_validation,
+        })
+
     return {
         "input_summary": {
             "input_mode": input_mode,
@@ -351,8 +382,12 @@ def run_premium_cable_sizing(
         "global_correction_factor": round(correction_factor, 3),
         "selected_cable": selected,
         "recommended_equipment": equipment_selection,
+        "engineering_justification":
+            engineering_justification,
+
         "evaluated_options": evaluated,
         "recommendations": recommendations
     }
+
 
 
