@@ -1,93 +1,183 @@
-﻿from app.engineering.reactive_power.power_factor_correction import (
-    calculate_required_kvar
-)
+﻿import math
 
-from app.engineering.reactive_power.capacitor_bank_sizing import (
-    determine_capacitor_bank_configuration
-)
 
-from app.engineering.reactive_power.resonance_analysis import (
-    evaluate_resonance_risk
-)
+def calculate_reactive_power_compensation(
+    active_power_kw: float,
+    initial_power_factor: float,
+    target_power_factor: float
+):
 
-from app.engineering.reactive_power.generator_compatibility import (
-    evaluate_generator_compatibility
-)
+    initial_angle = math.acos(initial_power_factor)
+
+    target_angle = math.acos(target_power_factor)
+
+    kvar_required = (
+        active_power_kw
+        * (
+            math.tan(initial_angle)
+            - math.tan(target_angle)
+        )
+    )
+
+    return round(kvar_required, 2)
+
+
+def evaluate_power_factor(
+    power_factor: float
+):
+
+    recommendations = []
+
+    status = "acceptable"
+
+    if power_factor < 0.8:
+
+        status = "poor"
+
+        recommendations.append(
+            "Poor power factor detected. Compensation strongly recommended."
+        )
+
+    elif power_factor < 0.92:
+
+        status = "moderate"
+
+        recommendations.append(
+            "Moderate power factor detected. Compensation may improve efficiency."
+        )
+
+    else:
+
+        recommendations.append(
+            "Power factor appears acceptable."
+        )
+
+    return {
+        "status": status,
+        "recommendations": recommendations
+    }
+
+
+def recommend_compensation_type(
+    kvar_required: float,
+    has_harmonics: bool,
+    load_variation: str
+):
+
+    recommendations = []
+
+    load_variation = load_variation.lower()
+
+    if load_variation == "stable":
+
+        recommendations.append(
+            "Fixed capacitor bank may be suitable."
+        )
+
+    else:
+
+        recommendations.append(
+            "Automatic capacitor bank recommended due to varying load."
+        )
+
+    if has_harmonics:
+
+        recommendations.append(
+            "Harmonics detected. Detuned or filtered capacitor bank recommended."
+        )
+
+    if kvar_required > 300:
+
+        recommendations.append(
+            "Large compensation level detected. Multi-step bank recommended."
+        )
+
+    return recommendations
+
+
+def evaluate_resonance_risk(
+    has_harmonics: bool,
+    capacitor_bank_present: bool
+):
+
+    recommendations = []
+
+    risk = "low"
+
+    if has_harmonics and capacitor_bank_present:
+
+        risk = "high"
+
+        recommendations.append(
+            "Potential resonance risk detected between harmonics and capacitor bank."
+        )
+
+        recommendations.append(
+            "Detuned reactors recommended."
+        )
+
+    else:
+
+        recommendations.append(
+            "No major resonance concern detected."
+        )
+
+    return {
+        "risk": risk,
+        "recommendations": recommendations
+    }
 
 
 def run_reactive_power_analysis(
     active_power_kw: float,
     initial_power_factor: float,
     target_power_factor: float,
-    harmonic_environment: bool,
-    generator_present: bool,
-    generator_kva: float,
-    thdi_percent: float
+    has_harmonics: bool,
+    load_variation: str
 ):
 
-    required_kvar = (
-        calculate_required_kvar(
-            active_power_kw=active_power_kw,
-            initial_power_factor=initial_power_factor,
-            target_power_factor=target_power_factor
-        )
+    kvar_required = calculate_reactive_power_compensation(
+        active_power_kw=active_power_kw,
+        initial_power_factor=initial_power_factor,
+        target_power_factor=target_power_factor
     )
 
-    capacitor_bank = (
-        determine_capacitor_bank_configuration(
-            required_kvar=required_kvar
-        )
+    pf_analysis = evaluate_power_factor(
+        power_factor=initial_power_factor
     )
 
-    resonance = (
-        evaluate_resonance_risk(
-            harmonic_environment=harmonic_environment,
-            generator_present=generator_present,
-            thdi_percent=thdi_percent
-        )
+    compensation = recommend_compensation_type(
+        kvar_required=kvar_required,
+        has_harmonics=has_harmonics,
+        load_variation=load_variation
     )
 
-    generator_compatibility = (
-        evaluate_generator_compatibility(
-            generator_kva=generator_kva,
-            capacitor_bank_kvar=required_kvar
-        )
+    resonance = evaluate_resonance_risk(
+        has_harmonics=has_harmonics,
+        capacitor_bank_present=True
     )
 
     recommendations = []
 
     recommendations.extend(
-        capacitor_bank["recommendations"]
+        pf_analysis["recommendations"]
+    )
+
+    recommendations.extend(
+        compensation
     )
 
     recommendations.extend(
         resonance["recommendations"]
     )
 
-    recommendations.extend(
-        generator_compatibility["recommendations"]
+    recommendations.append(
+        "Verify capacitor switching transients and protection coordination."
     )
 
-    if resonance["risk"] == "high":
-
-        recommendations.append(
-            "Use detuned capacitor bank with harmonic filtering."
-        )
-
     return {
-
-        "required_reactive_power_kvar":
-            required_kvar,
-
-        "capacitor_bank_configuration":
-            capacitor_bank,
-
-        "resonance_analysis":
-            resonance,
-
-        "generator_compatibility":
-            generator_compatibility,
-
-        "recommendations":
-            recommendations
+        "required_compensation_kvar": kvar_required,
+        "power_factor_analysis": pf_analysis,
+        "resonance_analysis": resonance,
+        "recommendations": recommendations
     }
