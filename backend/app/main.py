@@ -21,6 +21,7 @@ from app.api.routes.changeover_routes import router as changeover_router
 from app.api.routes.catalog_routes import router as catalog_router
 from app.api.routes.protection_selection_routes import router as protection_selection_router
 from app.api.routes.short_circuit_routes import router as short_circuit_router
+from app.api.routes.transformer_routes import router as transformer_router
 
 
 app = FastAPI(
@@ -60,6 +61,7 @@ app.include_router(changeover_router)
 app.include_router(catalog_router)
 app.include_router(protection_selection_router)
 app.include_router(short_circuit_router)
+app.include_router(transformer_router)
 
 
 @app.get("/")

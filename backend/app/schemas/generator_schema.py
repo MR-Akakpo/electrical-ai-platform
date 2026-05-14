@@ -3,33 +3,22 @@
 
 class GeneratorAnalysisRequest(BaseModel):
 
-    total_load_kw: float = Field(gt=0)
+    generator_power_kva: float = Field(gt=0)
 
-    power_factor: float = Field(gt=0, le=1)
+    voltage_v: float = Field(gt=0)
 
-    motor_start_kva: float = Field(ge=0)
+    connected_load_kva: float = Field(gt=0)
 
-    fuel_tank_liters: float = Field(ge=0)
+    largest_motor_kw: float = Field(ge=0)
+
+    fuel_tank_liters: float = Field(gt=0)
 
     fuel_consumption_lph: float = Field(gt=0)
 
-    load_type: str = "mixed"
+    number_of_generators: int = Field(gt=0)
 
-    redundancy_type: str = "N+1"
+    required_generators: int = Field(gt=0)
 
+    application: str = "general"
 
-class GeneratorAnalysisResponse(BaseModel):
-
-    required_generator_kva: float
-
-    base_generator_kva: float
-
-    voltage_dip_percent: float
-
-    transient_analysis: str
-
-    fuel_autonomy_hours: float
-
-    redundancy_type: str
-
-    recommendations: list[str]
+    generator_type: str = "diesel"
