@@ -33,3 +33,4 @@ def root():
         "loaded_routes": app.state.loaded_routes,
         "skipped_routes": app.state.skipped_routes
     }
+
