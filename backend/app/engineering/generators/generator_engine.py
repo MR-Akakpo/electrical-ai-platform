@@ -219,3 +219,40 @@ def run_generator_analysis(
         "fuel_autonomy_hours": autonomy,
         "recommendations": recommendations
     }
+from app.engineering.generators.generator_engine import (
+    run_generator_analysis
+)
+
+
+def run_generator_engineering_analysis(
+    total_load_kw: float = 0,
+    power_factor: float = 0.8,
+    motor_start_kva: float = 0,
+    fuel_tank_liters: float = 0,
+    fuel_consumption_lph: float = 1,
+    load_type: str = "mixed",
+    redundancy_type: str = "N+1"
+):
+
+    connected_load_kva = (
+        total_load_kw
+        / power_factor
+        if power_factor > 0
+        else total_load_kw
+    )
+
+    return run_generator_analysis(
+        generator_power_kva=connected_load_kva * 1.2,
+        voltage_v=400,
+        connected_load_kva=connected_load_kva,
+        largest_motor_kw=motor_start_kva / 6,
+        fuel_tank_liters=fuel_tank_liters,
+        fuel_consumption_lph=fuel_consumption_lph,
+        number_of_generators=2 if redundancy_type == "N+1" else 1,
+        required_generators=1,
+        application=load_type,
+        generator_type="diesel"
+    )
+
+
+from app.engineering.generators.generator_engine import *
