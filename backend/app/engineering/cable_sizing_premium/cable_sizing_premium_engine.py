@@ -1,5 +1,9 @@
 ﻿import math
 
+from app.engineering.equipment_selection_engine import (
+    build_engineering_recommendation
+)
+
 
 STANDARD_SECTIONS_MM2 = [
     1.5, 2.5, 4, 6, 10, 16, 25, 35, 50, 70, 95, 120,
@@ -317,6 +321,11 @@ def run_premium_cable_sizing(
 
     recommendations.append("Final validation must use IEC installation tables, manufacturer data and local regulations.")
 
+    equipment_selection = build_engineering_recommendation(
+        current_a=design_current,
+        material="Copper" if conductor_material.lower() == "copper" else "Aluminum"
+    )
+
     return {
         "input_summary": {
             "input_mode": input_mode,
@@ -334,6 +343,8 @@ def run_premium_cable_sizing(
         "required_current_with_margin_a": round(required_current, 2),
         "global_correction_factor": round(correction_factor, 3),
         "selected_cable": selected,
+        "recommended_equipment": equipment_selection,
         "evaluated_options": evaluated,
         "recommendations": recommendations
     }
+
