@@ -17,6 +17,7 @@ from app.api.routes.protection_coordination_routes import router as protection_c
 from app.api.routes.harmonic_routes import router as harmonic_router
 from app.api.routes.cable_routing_routes import router as cable_routing_router
 from app.api.routes.busbar_routes import router as busbar_router
+from app.api.routes.changeover_routes import router as changeover_router
 
 
 app = FastAPI(
@@ -52,6 +53,7 @@ app.include_router(protection_coordination_router)
 app.include_router(harmonic_router)
 app.include_router(cable_routing_router)
 app.include_router(busbar_router)
+app.include_router(changeover_router)
 
 
 @app.get("/")
