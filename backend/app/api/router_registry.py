@@ -36,6 +36,7 @@ ROUTERS = [
     ("app.api.routes.report_routes", "report_router"),
     ("app.api.routes.audit_routes", "audit_router"),
     ("app.api.routes.export_routes", "export_router"),
+    ("app.api.routes.technical_audit_routes", "technical_audit_router"),
 ]
 
 
@@ -60,3 +61,4 @@ def register_all_routes(app):
 
     app.state.loaded_routes = loaded_routes
     app.state.skipped_routes = skipped_routes
+
