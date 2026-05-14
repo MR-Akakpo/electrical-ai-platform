@@ -211,3 +211,30 @@ def run_motor_analysis(
         "loading_analysis": loading,
         "recommendations": recommendations
     }
+from app.engineering.motors.motor_engine import (
+    run_motor_analysis
+)
+
+
+def run_motor_engineering_analysis(
+    motor_power_kw: float,
+    voltage_v: float,
+    power_factor: float,
+    efficiency: float,
+    starting_method: str,
+    generator_kva: float = 0
+):
+
+    return run_motor_analysis(
+        motor_power_kw=motor_power_kw,
+        voltage_v=voltage_v,
+        efficiency=efficiency,
+        power_factor=power_factor,
+        connected_load_kw=motor_power_kw,
+        starting_method=starting_method,
+        criticality="standard",
+        application="general"
+    )
+
+
+from app.engineering.motors.motor_engine import *
