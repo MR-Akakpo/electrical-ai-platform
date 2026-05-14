@@ -1,6 +1,8 @@
 ﻿from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.cors import CORSMiddleware 
 
+
+from app.api.routes.earthing_routes import router as earthing_router
 from app.api.routes.project_routes import router as project_router
 from app.api.routes.cable_routes import router as cable_router
 from app.api.routes.engineering_routes import router as engineering_router
@@ -21,6 +23,7 @@ from app.api.routes.changeover_routes import router as changeover_router
 from app.api.routes.catalog_routes import router as catalog_router
 from app.api.routes.protection_selection_routes import router as protection_selection_router
 from app.api.routes.short_circuit_routes import router as short_circuit_router
+from app.api.routes.health_routes import router as health_router
 from app.api.routes.transformer_routes import router as transformer_router
 
 
@@ -61,8 +64,9 @@ app.include_router(changeover_router)
 app.include_router(catalog_router)
 app.include_router(protection_selection_router)
 app.include_router(short_circuit_router)
+app.include_router(health_router)
 app.include_router(transformer_router)
-
+app.include_router(earthing_router)
 
 @app.get("/")
 def root():
