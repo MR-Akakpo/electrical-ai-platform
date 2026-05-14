@@ -28,3 +28,12 @@ Thumbs.db
 # Build
 dist/
 build/
+
+# Local vector databases / generated knowledge stores
+**/vector_db/
+**/chroma.sqlite3
+**/*.sqlite3
+
+# Local environment files
+backend/.env
+.env
